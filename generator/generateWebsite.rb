@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby -w
 require 'yaml'
 require 'fileutils'
+require 'digest/md5'
 
 # configs
 # prefix@proklos
@@ -52,31 +53,24 @@ def getDataAndVideoUrl(filename)
 	return @data
 end
 
-def getListOfFiles
+def getListOfTXTFiles
 	Dir.chdir($quellen)
 	@filelist = Dir.glob("*.txt")
 	return @filelist
 end
 
-def generateNavigation
-	
+def getListOfFiles
+	Dir.chdir($quellen)
+	@filelist = Dir.glob("*")
+	return @filelist
 end
 
-def generateHeader
-	
-end
-
-def generateFooter
-	
-end
-
-def generateWebsite (template, filename)
+def generateWebpage (template, filename)
 	@filename = filename
 	@template = template
 	@data 		= getDataAndVideoUrl(@filename)
 	@website 	= pasteDateInTemplate(@template, @data)
 	writeWebPage(@filename, @website)
-	
 end
 
 def pasteDateInTemplate(template, data)
@@ -94,52 +88,77 @@ def pasteDateInTemplate(template, data)
 	return @webpage
 end
 
+
 def writeWebPage(filename, content)
-  if !File.exist?($webverzeichnis+"styles.css")
-	  FileUtils.cp $generaterroot+'style.css', $webverzeichnis+'style.css'
-	end
+ 	FileUtils.cp $generaterroot+"style.css", $webverzeichnis+"style.css" if !File.exist?($webverzeichnis+'styles.css')
   @filename = $webverzeichnis+File.basename(filename)[0..-4]+"html"
-		 File.open(@filename, 'w') {|f| content.each { |line| f.write(line+"\n") }}
+  File.open(@filename, 'w') {|f| content.each { |line| f.write(line+"\n") }}
 	@videofile = File.basename(filename)[0..-4]+"mp4"
-	if !File.exist?($webverzeichnis+@videofile)
-		FileUtils.cp $quellen+@videofile, $webverzeichnis
-	end
+	FileUtils.cp $quellen+@videofile, $webverzeichnis if !File.exist?($webverzeichnis+@videofile)
 end
 
-def makeM5File
-	@md5list= []
+
+def getMD5FileData
+	@md5list = []
 	@filelist = getListOfFiles
 	@filelist.each do |filename|
-		md5value =  Digest::MD5.file('filename')
-		@md5list[filename] = md5value
+		md5value =  Digest::MD5.file($quellen+filename)
+		@md5list.push([filename, md5value.to_s])
 	end
-	puts @md5list
+	return @md5list
 end
 
+def writeMD5FileData
+	@md5sums = getMD5FileData
+	f = File.open($webverzeichnis+"md5sum","w")
+	@md5sums.each {|file| f.puts(file[0]+": "+file[1])}
+end
+
+def readMD5Values
+	@MD5s = YAML.load_file($webverzeichnis+"md5sum")
+	return @MD5s
+end
 
 def checkForNewVideos
-		#Build in not exist a hash-list of videos
-		#Build an second list an compair
-		#give back a lsit of new Video
-		sums = IO.readlines("SHA1SUMS").map(&:chomp)
-		newsums = IO.readlines("newSHA1SUM").map(&:chomp)
-		puts "HALLO"
-		puts sums.to_s
-		puts newsums.to_s
+		@listOfChanges = []
+		@currentMD5s = getMD5FileData.sort
+		@oldMD5s = readMD5Values.to_a.sort
+		@newFiles=@currentMD5s-@oldMD5s
+	  @newFiles.each { |file| @listOfChanges.push(file[0])}
+	  @currentMD5s.each do |file|
+		   @listOfChanges.push(file[0]) if !File.exist?($webverzeichnis+file[0][0..-4]+"html")
+		   @listOfChanges.push(file[0]) if !File.exist?($webverzeichnis+file[0][0..-4]+"mp4")
+		end
+		return @listOfChanges
 end
 
 
-makeM5File
+def buildWebsite
+	@files = checkForNewVideos
+	@files.each do |file|
+		FileUtils.cp $quellen+file, $webverzeichnis if file[-3,3]=='mp4'
+		template=loadTemplate 											if file[-3,3]=='txt'
+  	generateWebpage(template, file) 						if file[-3,3]=='txt'
+  	puts "Build Website from  "+file
+	end
+	writeMD5FileData
+end
 
 
+buildWebsite
+
+#listOfNewFile = []
+#aktuelle_md5werte = getMD5FileData
+#oldmd5werte = IO.read($webverzeichnis+"md5sum")
+
+#puts oldmd5werte.inspect
 
 
-
-
-#FileUtils.rm_r Dir.glob($webverzeichnis+'*.*')
-#files = getListOfFiles
+# FileUtils.rm_r Dir.glob($webverzeichnis+'*.*')
+#files = getListOfTXTFiles
 #files.each do |file|
 #	template=loadTemplate
 #	generateWebsite(template, file)
 #end
- 
+#@md5sums = getMD5FileData
+#   IO.write($webverzeichnis+"md5sum", @md5sums)

@@ -2,6 +2,6 @@ fach: Deutsch
 klasse: 3
 thema: Nomen bestimmen
 beschreibung: In diesem Video lernst du wie du Nomen von Verben unterscheiden kannst.
-
+aufgaben: Suche dir einen Partner und löse gemeinsam die Aufgabe
 
 
