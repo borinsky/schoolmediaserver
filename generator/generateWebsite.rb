@@ -94,16 +94,15 @@ def pasteDateInTemplate(template, data)
 	return @webpage
 end
 
-# Alle Schreibaktionen im Augenblick deaktiviert
 def writeWebPage(filename, content)
   if !File.exist?($webverzeichnis+"styles.css")
-#	  FileUtils.cp $generaterroot+'style.css', $webverzeichnis+'style.css'
+	  FileUtils.cp $generaterroot+'style.css', $webverzeichnis+'style.css'
 	end
   @filename = $webverzeichnis+File.basename(filename)[0..-4]+"html"
-# File.open(@filename, 'w') {|f| content.each { |line| f.write(line+"\n") }}
+		 File.open(@filename, 'w') {|f| content.each { |line| f.write(line+"\n") }}
 	@videofile = File.basename(filename)[0..-4]+"mp4"
 	if !File.exist?($webverzeichnis+@videofile)
-#		FileUtils.cp $quellen+@videofile, $webverzeichnis
+		FileUtils.cp $quellen+@videofile, $webverzeichnis
 	end
 end
 
