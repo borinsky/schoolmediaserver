@@ -1,0 +1,6 @@
+Fach: z.B. Deutsch
+Klasse: z.B. 3
+Thema: z.B. Nomen bestimmen
+Beschreibung: z.B. In diesem Video lernst du wie du Nomen von Verben unterscheiden kannst.
+Aufgaben: (optional)
+nextvideo: (optional)

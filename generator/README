@@ -1,0 +1,5 @@
+Diese Script generiert eine Webseite zu Dateien,
+die im Verzeichnis sources liegen.
+
+Zu jedem Lernobjekt gehört eine Videodatei, die muss in mp4 vorliegen. Und eine txt-Datei die die Metadaten enthält.
+Um zusehen, Was die txt-Datei als metadaten alles enthalten kann schaue in template.txt nach 

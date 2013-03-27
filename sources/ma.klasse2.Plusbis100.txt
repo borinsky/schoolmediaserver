@@ -1,0 +1,7 @@
+fach: Mathematik
+klasse: 2
+thema: Addieren bis 100
+beschreibung: Hier wird dir erklärt, wie man bis 100 addiert 
+
+
+

@@ -1,0 +1,7 @@
+fach: Sachunterricht
+klasse: 4
+thema: Roboter bauen
+beschreibung: Hier wird dir erklärt, wie man einen Roboter bauen kann	
+
+
+
