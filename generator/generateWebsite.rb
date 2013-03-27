@@ -3,11 +3,15 @@ require 'yaml'
 require 'fileutils'
 
 # configs
-$quellen = "../sources"
-$webverzeichnis = "../www"
+# prefix@proklos
+PREFIX="/Volumes/proklos/Users/cb/schoolmediaserver"
 
-$templatefile = "template.html"
-$cssfile = "style.css"
+$quellen = PREFIX+"/sources/"
+$webverzeichnis = PREFIX+"/www/"
+$generaterroot= PREFIX+"/generator/"
+
+$templatefile = PREFIX+"/generator/template.html"
+$cssfile = PREFIX+"/generator/style.css"
 
 build_all = true
 
@@ -45,8 +49,13 @@ def getDataAndVideoUrl(filename)
 	@data["videourl"] = "found no (mp4/ogg) video"
 	@data["videourl"] = mp4url if File.exist?(mp4url)
 	@data["videourl"] = oggurl if File.exist?(oggurl)
-	puts @data
 	return @data
+end
+
+def getListOfFiles
+	Dir.chdir($quellen)
+	@filelist = Dir.glob("*.txt")
+	return @filelist
 end
 
 def generateNavigation
@@ -62,11 +71,13 @@ def generateFooter
 end
 
 def generateWebsite (template, filename)
+	puts template
 	@filename = filename
 	@template = template
-	@data 		= getDataAndVideoUrl(filename)
+	@data 		= getDataAndVideoUrl(@filename)
 	@website 	= pasteDateInTemplate(@template, @data)
 	writeWebPage(@filename, @website)
+	
 end
 
 def pasteDateInTemplate(template, data)
@@ -85,13 +96,11 @@ def pasteDateInTemplate(template, data)
 end
 
 def writeWebPage(filename, content)
-	### only 4 testing ###
-	FileUtils.rm_r Dir.glob('../www/*.*')
-	######################
-  if !File.exist?("../www/styles.css")
-	  FileUtils.cp './style.css', '../www/style.css'
+	puts Dir.pwd
+  if !File.exist?($webverzeichnis+"styles.css")
+	  FileUtils.cp $generaterroot+'style.css', $webverzeichnis+'style.css'
 	end
-  @filename = "../www/"+File.basename(filename)[0..-4]+"html"
+  @filename = $webverzeichnis+File.basename(filename)[0..-4]+"html"
 	File.open(@filename, 'w') {|f| content.each { |line| f.write(line+"\n") }}
 end
 
@@ -114,9 +123,12 @@ def checkForNewVideos
 		puts newsums.to_s
 end
 
-$template=loadTemplate
 
-@files = getListOfFiles
 
-@files.each { |file| generateWebsite($template, file) }
+FileUtils.rm_r Dir.glob($webverzeichnis+'*.*')
+files = getListOfFiles
+files.each do |file|
+	template=loadTemplate
+	generateWebsite(template, file)
+end
  
