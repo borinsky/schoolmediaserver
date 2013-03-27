@@ -12,6 +12,7 @@ $webverzeichnis = PREFIX+"/www/"
 $generaterroot= PREFIX+"/generator/"
 
 $templatefile = PREFIX+"/generator/template.html"
+$templateindex = PREFIX+"/generator/template-index.html"
 $cssfile = PREFIX+"/generator/style.css"
 
 build_all = true
@@ -27,6 +28,10 @@ $beschreibung = ""
 $videourl			= ""
 $aufgaben			= ""
 $nextvideo 		= ""
+
+
+$klassen = ["klasse1", "klasse2", "klasse3", "klasse4"]
+$faecher = [["de", "Deutsch"], ["ma", "Mathe"], ["su", "Sachunterricht"]]
 
 def loadTemplate
 	@template = IO.readlines($templatefile).map(&:chomp)
@@ -144,16 +149,60 @@ def buildWebsite
 	writeMD5FileData
 end
 
+def getFachListen(fach)
+	
+	return @linkliste
+end
 
-def buildSiteMap
-	@liste = getListOfTXTFiles
-	puts @liste
+
+##### Generate Index-Sites
+def loadIndexTemplate
+	 @template = IO.readlines($templateindex).map(&:chomp)
+	 return @template
+end
+
+def writeIndexPage(filename, content)
+	File.open(filename, 'w') {|f| content.each { |line| f.write(line+"\n") }}
+end
+
+def getFileOfFach(fach)
+	@listOfFiles = []
+	@filelist = getListOfTXTFiles
+  @filelist.each  { |file| @listOfFiles.push(file) if file[0..1] == fach[0]}
+  @listOfFiles.each { |file|  }
+	return @links
+end
+
+def generateFachIndexes
+	@template = loadIndexTemplate
+	$faecher.each do |fach|
+		@links = getFileOfFach(fach)
+		writeIndexPage($webverzeichnis+"index."+fach[0]+".html", @template)
+	end
+end
+
+def generateKlassenIndexes
+	@content = loadIndexTemplate
+	$klassen.each { |klasse| writeIndexPage($webverzeichnis+"index."+klasse.to_s+".html", @content)}
 end
 
 
 
-@buildWebsite
-buildSiteMap
+def generateIndexPages
+	generateFachIndexes
+	generateKlassenIndexes
+end
+
+def buildSiteMap
+	@liste = getListOfTXTFiles.sort
+	puts @liste
+end
+
+
+FileUtils.rm_r Dir.glob($webverzeichnis+'*.*')
+generateIndexPages
+#buildWebsite
+# => buildSiteMap
 
 
 #listOfNewFile = []
