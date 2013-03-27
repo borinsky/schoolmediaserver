@@ -145,7 +145,16 @@ def buildWebsite
 end
 
 
-buildWebsite
+def buildSiteMap
+	@liste = getListOfTXTFiles
+	puts @liste
+end
+
+
+
+@buildWebsite
+buildSiteMap
+
 
 #listOfNewFile = []
 #aktuelle_md5werte = getMD5FileData
