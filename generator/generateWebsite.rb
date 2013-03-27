@@ -71,7 +71,6 @@ def generateFooter
 end
 
 def generateWebsite (template, filename)
-	puts template
 	@filename = filename
 	@template = template
 	@data 		= getDataAndVideoUrl(@filename)
@@ -101,7 +100,8 @@ def writeWebPage(filename, content)
 	  FileUtils.cp $generaterroot+'style.css', $webverzeichnis+'style.css'
 	end
   @filename = $webverzeichnis+File.basename(filename)[0..-4]+"html"
-	File.open(@filename, 'w') {|f| content.each { |line| f.write(line+"\n") }}
+	# File.open(@filename, 'w') {|f| content.each { |line| f.write(line+"\n") }}
+	puts content.to_s
 end
 
 def makeSHA1
