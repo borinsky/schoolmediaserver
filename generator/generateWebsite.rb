@@ -94,23 +94,24 @@ def pasteDateInTemplate(template, data)
 	return @webpage
 end
 
+# Alle Schreibaktionen im Augenblick deaktiviert
 def writeWebPage(filename, content)
-	puts Dir.pwd
   if !File.exist?($webverzeichnis+"styles.css")
-	  FileUtils.cp $generaterroot+'style.css', $webverzeichnis+'style.css'
+#	  FileUtils.cp $generaterroot+'style.css', $webverzeichnis+'style.css'
 	end
   @filename = $webverzeichnis+File.basename(filename)[0..-4]+"html"
-	# File.open(@filename, 'w') {|f| content.each { |line| f.write(line+"\n") }}
-	puts content.to_s
-end
-
-def makeSHA1
-	if FileTest.exist?("SHA1SUMS")
-		exec('sha1sum * > newSHA1SUM')
-	else
-		exec('sha1sum * > SHA1SUMS')
+# File.open(@filename, 'w') {|f| content.each { |line| f.write(line+"\n") }}
+	@videofile = File.basename(filename)[0..-4]+"mp4"
+	if !File.exist?($webverzeichnis+@videofile)
+#		FileUtils.cp $quellen+@videofile, $webverzeichnis
 	end
 end
+
+def makeM5File
+	filelist = getListOfFiles
+	
+end
+
 
 def checkForNewVideos
 		#Build in not exist a hash-list of videos
