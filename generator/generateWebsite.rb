@@ -108,8 +108,13 @@ def writeWebPage(filename, content)
 end
 
 def makeM5File
-	filelist = getListOfFiles
-	
+	@md5list= []
+	@filelist = getListOfFiles
+	@filelist.each do |filename|
+		md5value =  Digest::MD5.file('filename')
+		@md5list[filename] = md5value
+	end
+	puts @md5list
 end
 
 
@@ -125,11 +130,17 @@ def checkForNewVideos
 end
 
 
+makeM5File
 
-FileUtils.rm_r Dir.glob($webverzeichnis+'*.*')
-files = getListOfFiles
-files.each do |file|
-	template=loadTemplate
-	generateWebsite(template, file)
-end
+
+
+
+
+
+#FileUtils.rm_r Dir.glob($webverzeichnis+'*.*')
+#files = getListOfFiles
+#files.each do |file|
+#	template=loadTemplate
+#	generateWebsite(template, file)
+#end
  
