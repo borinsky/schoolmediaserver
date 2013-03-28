@@ -13,6 +13,7 @@ $generaterroot= PREFIX+"/generator/"
 
 $templatefile = PREFIX+"/generator/template-video.html"
 $templateindex = PREFIX+"/generator/template-index.html"
+$templateindexall = PREFIX+"/generator/template-index-all.html"
 $cssfile = PREFIX+"/generator/style.css"
 
 build_all = true
@@ -33,8 +34,8 @@ $klassen = ["klasse1", "klasse2", "klasse3", "klasse4"]
 $faecher = [["de", "Deutsch"], ["ma", "Mathe"], ["su", "Sachunterricht"]]
 
 
-def loadTemplate
-	@template = IO.readlines($templatefile).map(&:chomp)
+def loadTemplate(filename)
+	@template = IO.readlines(filename).map(&:chomp)
 	return @template
 end
 
@@ -104,8 +105,8 @@ end
 
 def checkCSSandJavascript
 	FileUtils.cp $generaterroot+"style.css", $webverzeichnis+"style.css" if !File.exist?($webverzeichnis+'styles.css')
-	FileUtils.cp $generaterroot+"jquery.js", $webverzeichnis+"style.css" if !File.exist?($webverzeichnis+'jquery.js')
-	FileUtils.cp $generaterroot+"animation.js", $webverzeichnis+"style.css" if !File.exist?($webverzeichnis+'animation.js')
+	FileUtils.cp $generaterroot+"jquery.js", $webverzeichnis+"jquery.js" if !File.exist?($webverzeichnis+'jquery.js')
+	FileUtils.cp $generaterroot+"animation.js", $webverzeichnis+"animation.js" if !File.exist?($webverzeichnis+'animation.js')
 end
 
 
@@ -161,8 +162,8 @@ def buildWebsite
 	@files = checkForNewVideos
 	@files.each do |file|
 		FileUtils.cp $quellen+file, $webverzeichnis if file[-3,3]=='mp4'
-		template=loadTemplate 											if file[-3,3]=='txt'
-  	generateVideopage(template, file) 						if file[-3,3]=='txt'
+		template=loadTemplate($templatefile) 				if file[-3,3]=='txt'
+  	generateVideopage(template, file) 					if file[-3,3]=='txt'
   	puts "Build Website from  "+file
 	end
 	writeMD5FileData
@@ -175,10 +176,6 @@ end
 
 
 ##### Generate Index-Sites
-def loadIndexTemplate
-	 @template = IO.readlines($templateindex).map(&:chomp)
-	 return @template
-end
 
 def writeIndexPage(filename, content)
 	File.open(filename, 'w') {|f| content.each { |line| f.write(line+"\n") }}
@@ -206,7 +203,7 @@ end
 
 def pasteLinksInIndexpage(listOfLinks)
   @listOfLinksString = ""
-	@webpage	=	loadIndexTemplate
+	@webpage	=	loadTemplate($templateindex)
 	@webpage.each do |line|
       if line.include?("#LINKS#")
 	    	listOfLinks.each { |link| @listOfLinksString = @listOfLinksString + link}
@@ -240,11 +237,19 @@ def buildSiteMap
 	puts @liste
 end
 
+def generateIndexForAll
+	@indexpage =	loadTemplate($templateindexall)
+	@indexpage =  setHeaderAndFooter(@indexpage)
+	puts @indexpage
+	writeIndexPage($webverzeichnis+"index.html", @indexpage)
+		
+end
 
-FileUtils.rm_r Dir.glob($webverzeichnis+'*.*')
+#FileUtils.rm_r Dir.glob($webverzeichnis+'*.*')
 checkCSSandJavascript
-generateIndexPages
-buildWebsite
+generateIndexForAll
+#generateIndexPages
+#buildWebsite
 # => buildSiteMap
 
 

@@ -94,6 +94,60 @@ footer a {
 
 /* Content typical ---------------------------------- */
 
+#index_klasse1 {
+  background-color: #fff;
+}
+
+#index_klasse2 {
+  background-color: #fff;
+}
+
+#index_klasse3 {
+  background-color: #fff;
+}
+
+#index_klasse4 {
+  background-color: #fff;
+}
+
+#index_fach_de {
+  background-color: #fff;
+}
+
+#index_fach_ma {
+  background-color: #fff;
+}
+
+#index_fach_su {
+  background-color: #fff;
+}
+
+#index_fach_en {
+  background-color: #fff;
+}
+
+#index_klasse1,
+#index_klasse2,
+#index_klasse3,
+#index_klasse4,
+#index_fach_de,
+#index_fach_ma,
+#index_fach_su,
+#index_fach_en {
+  cursor: pointer;
+  font-size: 18px;
+}
+
+#links_klasse1,
+#links_klasse2,
+#links_klasse3,
+#links_klasse4,
+#links_fach_de,
+#links_fach_ma,
+#links_fach_su,
+#links_fach_en {
+  display: none;
+}
 
 #klasse {
 	color: #ff4d3e;
