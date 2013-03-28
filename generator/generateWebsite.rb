@@ -102,9 +102,14 @@ def pasteDateInTemplate(template, data)
 	return @webpage
 end
 
+def checkCSSandJavascript
+	FileUtils.cp $generaterroot+"style.css", $webverzeichnis+"style.css" if !File.exist?($webverzeichnis+'styles.css')
+	FileUtils.cp $generaterroot+"jquery.js", $webverzeichnis+"style.css" if !File.exist?($webverzeichnis+'jquery.js')
+	FileUtils.cp $generaterroot+"animation.js", $webverzeichnis+"style.css" if !File.exist?($webverzeichnis+'animation.js')
+end
+
 
 def writeWebPage(filename, content)
- 	FileUtils.cp $generaterroot+"style.css", $webverzeichnis+"style.css" if !File.exist?($webverzeichnis+'styles.css')
   @filename = $webverzeichnis+File.basename(filename)[0..-4]+"html"
   File.open(@filename, 'w') {|f| content.each { |line| f.write(line+"\n") }}
 	@videofile = File.basename(filename)[0..-4]+"mp4"
@@ -236,7 +241,8 @@ def buildSiteMap
 end
 
 
-#FileUtils.rm_r Dir.glob($webverzeichnis+'*.*')
+FileUtils.rm_r Dir.glob($webverzeichnis+'*.*')
+checkCSSandJavascript
 generateIndexPages
 buildWebsite
 # => buildSiteMap
