@@ -3,7 +3,7 @@ require 'yaml'
 require 'fileutils'
 require 'digest/md5'
 
-# configs
+# configs - Global
 # prefix@proklos
 PREFIX="/Volumes/proklos/Users/cb/schoolmediaserver"
 
@@ -29,14 +29,22 @@ $videourl			= ""
 $aufgaben			= ""
 $nextvideo 		= ""
 
-
 $klassen = ["klasse1", "klasse2", "klasse3", "klasse4"]
 $faecher = [["de", "Deutsch"], ["ma", "Mathe"], ["su", "Sachunterricht"]]
+
 
 def loadTemplate
 	@template = IO.readlines($templatefile).map(&:chomp)
 	return @template
 end
+
+def setHeaderAndFooter(website)
+	website.each do |line|
+		line.replace($header) if line.include?("#HEADER#")
+		line.replace($footer) if line.include?("#FOOTER#")
+	end
+end
+
 
 def getDataAndVideoUrl(filename)
 	@data = YAML.load_file(filename)
@@ -70,7 +78,8 @@ def getListOfFiles
 	return @filelist
 end
 
-def generateWebpage (template, filename)
+
+def generateVideopage (template, filename)
 	@filename = filename
 	@template = template
 	@data 		= getDataAndVideoUrl(@filename)
@@ -85,8 +94,8 @@ def pasteDateInTemplate(template, data)
 		replaceStr = "#"+key.upcase+"#"
 		@webpage.each do |line|
 			if line.match(replaceStr)
-				newline = line.sub(replaceStr, @data[key].to_s)
-				line.replace(newline)
+					newline = line.sub(replaceStr, @data[key].to_s)
+					line.replace(newline)
 			end
 		end
 	end
@@ -116,18 +125,23 @@ end
 def writeMD5FileData
 	@md5sums = getMD5FileData
 	f = File.open($webverzeichnis+"md5sum","w")
-	@md5sums.each {|file| f.puts(file[0]+": "+file[1])}
+	@md5sums.each { |file| f.puts(file[0]+": "+file[1])}
 end
 
 def readMD5Values
-	@MD5s = YAML.load_file($webverzeichnis+"md5sum")
-	return @MD5s
+	if File.exist?($webverzeichnis+"md5sum")
+		@MD5s = YAML.load_file($webverzeichnis+"md5sum")
+		@MD5s.sort
+	else
+		@MD5s = []
+	end
+	return @MD5s.to_a.sort
 end
 
 def checkForNewVideos
 		@listOfChanges = []
-		@currentMD5s = getMD5FileData.sort
-		@oldMD5s = readMD5Values.to_a.sort
+		@currentMD5s = getMD5FileData
+		@oldMD5s = readMD5Values
 		@newFiles=@currentMD5s-@oldMD5s
 	  @newFiles.each { |file| @listOfChanges.push(file[0])}
 	  @currentMD5s.each do |file|
@@ -143,7 +157,7 @@ def buildWebsite
 	@files.each do |file|
 		FileUtils.cp $quellen+file, $webverzeichnis if file[-3,3]=='mp4'
 		template=loadTemplate 											if file[-3,3]=='txt'
-  	generateWebpage(template, file) 						if file[-3,3]=='txt'
+  	generateVideopage(template, file) 						if file[-3,3]=='txt'
   	puts "Build Website from  "+file
 	end
 	writeMD5FileData
@@ -167,24 +181,41 @@ end
 
 def buildLink(fach, filename)
 	# aufbau: <a href="index.fach.filename.html"> FILENAME <a>
-	@link = "<a href=\"index."+fach+"."+filename+".html\">"+filename+"</a>"
+	#puts @fach.to_s, @filename.to_s
+	@url 				=	fach[0]+"."+filename+".html"
+  @linkname 	=	filename
+	@link = "\t\t<a href=\""+@url+"\">"+@linkname+"</a>\n"
 	return @link
 end
+
+
 def getFileOfFach(fach)
 	@links=[]
 	@listOfFiles = []
 	@filelist = getListOfTXTFiles
   @filelist.each  { |file| @listOfFiles.push(file[3..-5]) if file[0..1] == fach[0]}
   @listOfFiles.each { |file| @links.push(buildLink(fach, file))}
-  puts @links
 	return @links
 end
 
+
+def pasteLinksInIndexpage(listOfLinks)
+  @listOfLinksString = ""
+	@webpage	=	loadIndexTemplate
+	@webpage.each do |line|
+      if line.include?("#LINKS#")
+	    	listOfLinks.each { |link| @listOfLinksString = @listOfLinksString + link}
+	    	line.replace(@listOfLinksString) end
+	end
+	@webpage = setHeaderAndFooter(@webpage)
+	return @webpage
+end
+
 def generateFachIndexes
-	@template = loadIndexTemplate
 	$faecher.each do |fach|
 		@links = getFileOfFach(fach)
-		writeIndexPage($webverzeichnis+"index."+fach[0]+".html", @template)
+		@webpage = pasteLinksInIndexpage(@links)
+		writeIndexPage($webverzeichnis+"index."+fach[0]+".html", @webpage)
 	end
 end
 
@@ -205,9 +236,9 @@ def buildSiteMap
 end
 
 
-FileUtils.rm_r Dir.glob($webverzeichnis+'*.*')
+#FileUtils.rm_r Dir.glob($webverzeichnis+'*.*')
 generateIndexPages
-#buildWebsite
+buildWebsite
 # => buildSiteMap
 
 
