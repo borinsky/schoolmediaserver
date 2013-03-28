@@ -11,7 +11,7 @@ $quellen = PREFIX+"/sources/"
 $webverzeichnis = PREFIX+"/www/"
 $generaterroot= PREFIX+"/generator/"
 
-$templatefile = PREFIX+"/generator/template.html"
+$templatefile = PREFIX+"/generator/template-video.html"
 $templateindex = PREFIX+"/generator/template-index.html"
 $cssfile = PREFIX+"/generator/style.css"
 
@@ -165,11 +165,18 @@ def writeIndexPage(filename, content)
 	File.open(filename, 'w') {|f| content.each { |line| f.write(line+"\n") }}
 end
 
+def buildLink(fach, filename)
+	# aufbau: <a href="index.fach.filename.html"> FILENAME <a>
+	@link = "<a href=\"index."+fach+"."+filename+".html\">"+filename+"</a>"
+	return @link
+end
 def getFileOfFach(fach)
+	@links=[]
 	@listOfFiles = []
 	@filelist = getListOfTXTFiles
-  @filelist.each  { |file| @listOfFiles.push(file) if file[0..1] == fach[0]}
-  @listOfFiles.each { |file|  }
+  @filelist.each  { |file| @listOfFiles.push(file[3..-5]) if file[0..1] == fach[0]}
+  @listOfFiles.each { |file| @links.push(buildLink(fach, file))}
+  puts @links
 	return @links
 end
 
@@ -185,7 +192,6 @@ def generateKlassenIndexes
 	@content = loadIndexTemplate
 	$klassen.each { |klasse| writeIndexPage($webverzeichnis+"index."+klasse.to_s+".html", @content)}
 end
-
 
 
 def generateIndexPages
