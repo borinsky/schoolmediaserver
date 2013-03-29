@@ -237,10 +237,39 @@ def buildSiteMap
 	puts @liste
 end
 
+def getLinks4All
+	# get an hash like ["#LINKS_KLASSE1#"=>"<a href=...>TEXT</a>"]
+	@listOfPlaceholder = ["#LINKS_KLASSE1#", "#LINKS_KLASSE2#", "#LINKS_KLASSE3#",
+												"#LINKS_KLASSE4#", "#LINKS_DE#", "#LINKS_MA#", "#LINKS_SU#",
+												"#LINKS_EN#"]
+	@filelist = getListOfTXTFiles
+	puts @filelist
+	return @linkliste
+end
+
+def pasteLinksInIndexForAll(allLinks, indexpage)
+	@allLinks = allLinks
+	@indexpage = indexpage
+	@listOfPlaceholder = ["#LINKS_KLASSE1#", "#LINKS_KLASSE2#", "#LINKS_KLASSE3#",
+												"#LINKS_KLASSE4#", "#LINKS_DE#", "#LINKS_MA#", "#LINKS_SU#",
+												"#LINKS_EN#"]
+	@listOfPlaceholder.each do |linklist_placeholder|
+		@indexpage.each do |line|
+				if line.include?(linklist_placeholder)
+					newline = @allLinks[linklist_placeholder]
+					# line.replace(newline)
+				end
+		end
+	end
+	return @indexpage
+end
+
+
 def generateIndexForAll
 	@indexpage =	loadTemplate($templateindexall)
 	@indexpage =  setHeaderAndFooter(@indexpage)
-	puts @indexpage
+	@linkliste = getLinks4All
+	pasteLinksInIndexForAll(@linkliste, @indexpage)
 	writeIndexPage($webverzeichnis+"index.html", @indexpage)
 		
 end
