@@ -29,7 +29,7 @@ body {
 #header h1 {
   text-align: center;
   margin: 0;
-  padding: 15px 0;
+  padding: 5px 0;
   color: #A5A5A5;
 }
 
@@ -57,16 +57,15 @@ body {
 #header nav ul li.active a,
 #header nav ul li a:hover {
   background-color: #fff;
-  color: #444;
+  color: #000;
 }
 
 /* CONTENT ------------------------------------------ */
 
 #content {
-  width: 440px;
-  padding: 0 15px;
-  margin: 0 0 10px 0;
-  float: left;
+  width: 600px;
+  margin-left: 100px;
+  
 }
 
 /* SIDEBAR ------------------------------------------ */
@@ -82,17 +81,25 @@ aside {
 
 footer {
   clear: both;
-  background: #DDD;
+  background: #fff;
   text-align: right;
   padding: 10px 15px;
   margin: 10px 0 0 0;
+  color: silver;
 }
 
 footer a {
-  color: #999;
+  color: #fff;
 }
 
 /* Content typical ---------------------------------- */
+
+.links p {
+	margin: 20px;
+	padding: 10px;
+	background-color: #fff;
+	border-radius: 8px;
+}
 
 #index_klasse1 {
   background-color: #fff;
@@ -134,9 +141,17 @@ footer a {
 #index_fach_ma,
 #index_fach_su,
 #index_fach_en {
+  background-color: silver;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 16px;
+  display: block;
+  padding: 10px;
+  border-radius: 18px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
+
+
 
 #links_klasse1,
 #links_klasse2,
@@ -146,7 +161,9 @@ footer a {
 #links_fach_ma,
 #links_fach_su,
 #links_fach_en {
-  display: none;
+  	display: none;
+ 	border-radius: 14px;
+
 }
 
 #klasse {
@@ -171,7 +188,7 @@ footer a {
 }
 
 #video {
-	color: #000;
+
 }
 
 #nextvideo {

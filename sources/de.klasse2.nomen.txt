@@ -2,6 +2,6 @@ fach: Deutsch
 klasse: 2
 thema: Nomen bestimmen (einfach)	
 beschreibung: In diesem Video lernst du, wie du Nomen von Verben unterscheiden kannst.
-
+linktext: Nomen bestimmen (Klasse 2)
 
 

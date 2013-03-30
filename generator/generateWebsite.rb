@@ -3,18 +3,7 @@ require 'yaml'
 require 'fileutils'
 require 'digest/md5'
 
-# configs - Global
-# prefix@proklos
-PREFIX="/Volumes/proklos/Users/cb/schoolmediaserver"
-
-$quellen = PREFIX+"/sources/"
-$webverzeichnis = PREFIX+"/www/"
-$generaterroot= PREFIX+"/generator/"
-
-$templatefile = PREFIX+"/generator/template-video.html"
-$templateindex = PREFIX+"/generator/template-index.html"
-$templateindexall = PREFIX+"/generator/template-index-all.html"
-$cssfile = PREFIX+"/generator/style.css"
+load 'config.rb'
 
 $build_all = true
 
@@ -31,7 +20,7 @@ $aufgaben			= ""
 $nextvideo 		= ""
 
 $klassen = ["klasse1", "klasse2", "klasse3", "klasse4"]
-$faecher = [["de", "Deutsch"], ["ma", "Mathe"], ["su", "Sachunterricht"]]
+$faecher = [["de", "Deutsch"], ["ma", "Mathe"], ["su", "Sachunterricht"], ["en", "Englisch"] ]
 
 
 
@@ -46,15 +35,15 @@ end
 # ------------------
 
 def generateIndexForAll
-	@indexpage =	loadTemplate($templateindexall)
-	@indexpage =  setHeaderAndFooter(@indexpage)
-	@indexpage =  pasteLinks4All(@indexpage)
-	writePage($webverzeichnis+"index.html", @indexpage)		
+	indexpage =	loadTemplate($templateindexall)
+	indexpage =  setHeaderAndFooter(indexpage)
+	indexpage =  pasteLinks4All(indexpage)
+	writePage($webverzeichnis+"index.html", indexpage)		
 end
 
 def loadTemplate(filename)
-	@template = IO.readlines(filename).map(&:chomp)
-	return @template
+	template = IO.readlines(filename).map(&:chomp)
+	return template
 end
 
 def setHeaderAndFooter(website)
@@ -66,13 +55,22 @@ end
 
 def pasteLinks4All(filename)
 	@indexpage = filename
-	@filelist = getListOfTXTFiles
+	filelist = getListOfTXTFiles
 	$faecher.each do |fach|
-		@listOfFiles = selectFach(fach[0], @filelist)
+		@listOfFiles = selectFach(fach[0], filelist)
 		@placeholder = "#LINKS_"+fach[0].upcase
 		@linkString = ""		
 		@listOfFiles.each do |file|
-			@linkString += buildLink(fach, file)
+			@linkString += buildLink(file)
+		end
+		@indexpage = pasteLinksInIndex4All(@placeholder, @linkString, @indexpage)
+	end
+	$klassen.each do |klasse|
+		@listOfFiles = selectKlasse(klasse, filelist)
+		@placeholder = "#LINKS_"+klasse.upcase
+		@linkString = ""		
+		@listOfFiles.each do |file|
+			@linkString += buildLink(file)
 		end
 		@indexpage = pasteLinksInIndex4All(@placeholder, @linkString, @indexpage)
 	end
@@ -93,10 +91,19 @@ def selectFach(fach, filelist)
 	return @list
 end
 
-def buildLink(fach, filename)
-	@url 				=	fach[0]+"."+filename[3..-5]+".html"
-  @linkname 	=	getLinktext(filename)+"</br>"
-	@link = "\t\t<a href=\""+@url+"\">"+@linkname+"</a>\n"
+def selectKlasse(klasse, filelist)
+	# Fach must be: de,ma,su,en
+	# first 2 char of file is shortcut4subject
+	@list = []
+	filelist.each {|file| @list.push(file) if file[3..9]==klasse}
+	return @list
+end
+
+
+def buildLink(filename)
+	@url 				=	filename[0..-5]+".html"
+  @linkname 	=	getLinktext(filename)
+	@link = "\t\t<p><a href=\""+@url+"\">"+@linkname+"</a></p>\n"
 	return @link
 end
 
@@ -138,10 +145,10 @@ end
 def buildVideoPages
 	@files = checkForNewVideos
 	@files.each do |file|
+	  puts "working @ #{file}"
 		FileUtils.cp $quellen+file, $webverzeichnis if file[-3,3]=='mp4'
 		template=loadTemplate($templatefile) 				if file[-3,3]=='txt'
   	generateVideopage(template, file) 					if file[-3,3]=='txt'
-  	puts "Build Website from  "+file
 	end
 	writeMD5FileData
 end
