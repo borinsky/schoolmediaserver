@@ -8,6 +8,7 @@ load 'config.rb'
 $build_all = true
 
 # Variablen in der Webseite
+$sitetitle	  = "Schulvideoserver"
 $header				= "Lernvideos Grundschule Nadorst"
 $footer 			= "(c) Grundschule Nadorst"
 $navigation		= ""
@@ -20,7 +21,7 @@ $aufgaben			= ""
 $nextvideo 		= ""
 
 $klassen = ["klasse1", "klasse2", "klasse3", "klasse4"]
-$faecher = [["de", "Deutsch"], ["ma", "Mathe"], ["su", "Sachunterricht"], ["en", "Englisch"] ]
+$faecher = [["de", "Deutsch"], ["ma", "Mathe"], ["su", "Sachunterricht"], ["en", "Englisch"],["mo", "Montessori-Material"], ["li","Lehrer-Informationen"] ]
 
 
 
@@ -38,7 +39,7 @@ def generateIndexForAll
 	indexpage =	loadTemplate($templateindexall)
 	indexpage =  setHeaderAndFooter(indexpage)
 	indexpage =  pasteLinks4All(indexpage)
-	writePage($webverzeichnis+"index.html", indexpage)		
+	writePage($webverzeichnis+"index.html", indexpage)
 end
 
 def loadTemplate(filename)
@@ -49,6 +50,7 @@ end
 def setHeaderAndFooter(website)
 	website.each do |line|
 		line.replace($header) if line.include?("#HEADER#")
+		line.replace($sitetitle) if line.include?("#SITETITLE#")
 		line.replace($footer) if line.include?("#FOOTER#")
 	end
 end
@@ -59,7 +61,7 @@ def pasteLinks4All(filename)
 	$faecher.each do |fach|
 		@listOfFiles = selectFach(fach[0], filelist)
 		@placeholder = "#LINKS_"+fach[0].upcase
-		@linkString = ""		
+		@linkString = ""
 		@listOfFiles.each do |file|
 			@linkString += buildLink(file)
 		end
@@ -68,7 +70,7 @@ def pasteLinks4All(filename)
 	$klassen.each do |klasse|
 		@listOfFiles = selectKlasse(klasse, filelist)
 		@placeholder = "#LINKS_"+klasse.upcase
-		@linkString = ""		
+		@linkString = ""
 		@listOfFiles.each do |file|
 			@linkString += buildLink(file)
 		end
@@ -86,9 +88,9 @@ end
 def selectFach(fach, filelist)
 	# Fach must be: de,ma,su,en
 	# first 2 char of file is shortcut4subject
-	@list = []
-	filelist.each {|file| @list.push(file) if file[0..1]==fach}
-	return @list
+  list = []
+	filelist.each {|file| list.push(file) if file[0..1]==fach}
+	return list
 end
 
 def selectKlasse(klasse, filelist)
@@ -154,26 +156,26 @@ def buildVideoPages
 end
 
 def checkForNewVideos
-		@listOfChanges = []
-		@currentMD5s = getMD5FileData
-		@oldMD5s = readMD5Values
-		@newFiles=@currentMD5s-@oldMD5s
-	  @newFiles.each { |file| @listOfChanges.push(file[0])}
-	  @currentMD5s.each do |file|
-		   @listOfChanges.push(file[0]) if !File.exist?($webverzeichnis+file[0][0..-4]+"html")
-		   @listOfChanges.push(file[0]) if !File.exist?($webverzeichnis+file[0][0..-4]+"mp4")
+		listOfChanges = []
+		currentMD5s = getMD5FileData
+		oldMD5s = readMD5Values
+		newFiles=currentMD5s-oldMD5s
+	  newFiles.each { |file| listOfChanges.push(file[0])}
+	  currentMD5s.each do |file|
+		   listOfChanges.push(file[0]) if !File.exist?($webverzeichnis+file[0][0..-4]+"html")
+		   listOfChanges.push(file[0]) if !File.exist?($webverzeichnis+file[0][0..-4]+"mp4")
 		end
-		return @listOfChanges
+		return listOfChanges
 end
 
 def getMD5FileData
-	@md5list = []
-	@filelist = getListOfFiles
-	@filelist.each do |filename|
+	md5list = []
+	filelist = getListOfFiles
+	filelist.each do |filename|
 		md5value =  Digest::MD5.file($quellen+filename)
-		@md5list.push([filename, md5value.to_s])
+		md5list.push([filename, md5value.to_s])
 	end
-	return @md5list
+	return md5list
 end
 
 def getListOfFiles
@@ -196,7 +198,8 @@ def generateVideopage (template, filename)
 	@filename = filename
 	@template = template
 	@data 		= getDataAndVideoUrl(@filename)
-	@website 	= pasteDateInTemplate(@template, @data)
+	@website 	= pasteDataInTemplate(@template, @data)
+	@website  = setHeaderAndFooter(@website)
 	writeWebPage(@filename, @website)
 end
 
@@ -220,7 +223,7 @@ def getDataAndVideoUrl(filename)
 	return @data
 end
 
-def pasteDateInTemplate(template, data)
+def pasteDataInTemplate(template, data)
 	@data = data
 	@webpage = template
 	@data.each_key do |key|

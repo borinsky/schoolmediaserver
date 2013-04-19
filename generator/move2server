@@ -1,0 +1,2 @@
+#!/bin/bash
+rsync -avz -e ssh ../www/ videoserver@wiki.basiskonzepte.de:/home/videoserver/www/ 

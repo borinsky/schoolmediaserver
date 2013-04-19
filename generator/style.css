@@ -22,7 +22,7 @@ body {
 /* HEADER & NAVIGATION ------------------------------ */
 
 #header {
-  background: #093;
+  background: #00fa9a;
   padding: 0 15px;
 }
 
@@ -30,7 +30,7 @@ body {
   text-align: center;
   margin: 0;
   padding: 5px 0;
-  color: #A5A5A5;
+  color: #696969;
 }
 
 #header nav ul {
@@ -63,8 +63,8 @@ body {
 /* CONTENT ------------------------------------------ */
 
 #content {
-  width: 600px;
-  margin-left: 100px;
+  width: 700px;
+  margin-left: 50px;
   
 }
 
@@ -140,7 +140,9 @@ footer a {
 #index_fach_de,
 #index_fach_ma,
 #index_fach_su,
-#index_fach_en {
+#index_fach_en,
+#index_fach_mo,
+#index_fach_li {
   background-color: silver;
   cursor: pointer;
   font-size: 16px;
@@ -160,23 +162,42 @@ footer a {
 #links_fach_de,
 #links_fach_ma,
 #links_fach_su,
-#links_fach_en {
+#links_fach_en,
+#links_fach_mo,
+#links_fach_li {
   	display: none;
- 	border-radius: 14px;
-
+ 	  border-radius: 14px;
 }
 
+#backbutton {
+  background-color: #ffff66;
+  text-align: center;
+  cursor: pointer;
+  font-size: 12px;
+  display: block;
+  border-radius: 6px;
+  width: 220px;
+  height: 18px;
+  margin-left: 50px;
+  margin-top: 5px;
+ }
+
 #klasse {
-	color: #ff4d3e;
+  text-align: right;
+  font-size: 10pt;
+	color: #000;
 }
 
 #fach {
+  text-align: right;
+  font-size: 10pt;
 	color: #000;
 }
 
 #thema {
+  text-align: right;
+  font-size: 14pt;
 	color: #000;
-	text-align: center;
 }
 
 #beschreibung {

@@ -23,5 +23,11 @@ $(document).ready(function() {
 	$("#index_fach_en").click(function() {
 		$("#links_fach_en").slideToggle("fast");
 	});
+	$("#index_fach_mo").click(function() {
+		$("#links_fach_mo").slideToggle("fast");
+	});
+	$("#index_fach_li").click(function() {
+		$("#links_fach_li").slideToggle("fast");
+	});
 
 });
